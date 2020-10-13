@@ -79,7 +79,7 @@ const useStyles = makeStyles(() => ({
 
 export const Add = () => {
     const classes = useStyles();
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
     const [name, setName] = React.useState('');
     const [count, setCount] = React.useState('');
 
@@ -90,7 +90,8 @@ export const Add = () => {
         })
         .then(res => {
             if (!res.data.errors) {
-                history.push('/');
+                setName('');
+                setCount('');
             } else {
                 for (let i = 0; i < res.data.errors.length; i++) {
                     let message = `${res.data.errors[i].msg.errorCode}: ${res.data.errors[i].msg.errorMessage}`
@@ -120,9 +121,9 @@ export const Add = () => {
                 <Typography gutterBottom variant="h6" align='center'>ADD DATA</Typography>
             </Container>
             <Container className={classes.formContainer}>
-                <TextField className={classes.name} variant="outlined" label="Name" onChange={name => setName(name.target.value)} />
-                <TextField className={classes.count} variant="outlined" label="Count" onChange={count => setCount(count.target.value)} />
-                <Button className={classes.save} onClick={() => saveData()}>SAVE</Button>
+                <TextField className={classes.name} variant="outlined" label="Name" onChange={name => setName(name.target.value)} value={name} />
+                <TextField className={classes.count} variant="outlined" label="Count" onChange={count => setCount(count.target.value)} value={count} />
+                <Button className={classes.save} onClick={() => saveData()}>ADD MORE</Button>
             </Container>
         </Container>
     );
