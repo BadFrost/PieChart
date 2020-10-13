@@ -77,11 +77,17 @@ export const Main = () => {
   const [data, setData] = React.useState([]);
   const [show, setShow] = React.useState(false);
   const [info, setInfo] = React.useState({});
+  const [sum, setSum] = React.useState(0);
   
   React.useEffect(() => {
     const fetchData = async () => {
       const res = await axios('http://localhost:3001/get')
       setData(res.data.data);
+      let x = 0;
+      for (let i = 0; i < res.data.data.length; i++) {
+          x += Number(res.data.data[i].count);
+          setSum(x);
+      }
     };
     fetchData();
   }, []); 
@@ -105,20 +111,19 @@ export const Main = () => {
   };
 
   let PieChart = (props) => {
-    let calculatePosSpread = (width, height, radius, theta) => {
+    let calculatePos = (width, height, radius, theta) => {
       return [(width / 2.0 + (radius * (Math.sin(theta)))),
       (height / 2.0 - (radius * (Math.cos(theta))))];
     };
-  
-    let calculatePathSpread = () => {
+
+    let calculatePathPlain = () => {
       const { width, height, radius } = { ...props };
       let theta = 0;
-      let currentPos = calculatePosSpread(width, height, radius, theta);
+      let currentPos = calculatePos(width, height, radius, theta);
       const pathData = props.pieData.reduce((acc, curr, ind) => {
-        theta += (curr.count / 100) * 2 * Math.PI;
-        const nextPosTemp = calculatePosSpread(width, height, radius, theta);
-        const nextPos = calculatePosSpread(width, height, radius, theta-0.1);
-        const isBigCurveInt = (curr.count / 100) > 0.5 ? 1 : 0;
+        theta += (curr.count / sum) * 2 * Math.PI;
+        const nextPos = calculatePos(width, height, radius, theta);
+        const isBigCurveInt = (curr.count / sum) > 0.5 ? 1 : 0;
         const path = <path
           d={`M${+width / 2} ${+height / 2} L ${currentPos[0]} ${currentPos[1]} A ${radius} ${radius} 0 ${isBigCurveInt} 1 ${nextPos[0]} ${nextPos[1]} L ${width / 2.0} ${height / 2.0}`}
           fill={randomColor()}
@@ -126,7 +131,7 @@ export const Main = () => {
           key={ind}
           onMouseOver={x => showInfo(x, curr)}
         />;
-        currentPos = nextPosTemp;
+        currentPos = nextPos;
         acc.push(path);
         return acc;
       }, []);
@@ -135,7 +140,7 @@ export const Main = () => {
   
     return (
       <svg className="pieSVG" height={props.height} width={props.width}>
-        {calculatePathSpread()}
+        {calculatePathPlain()}
       </svg>
     )
   };
@@ -154,6 +159,7 @@ export const Main = () => {
         <Typography gutterBottom variant="h6" className={classes.legendSign}>INFO</Typography>
         {show ? Info() : ''}
       </Container>
+      
     </Container>
   );
 }
