@@ -1,17 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router } from "react-router-dom";
-import './index.css';
-import App from './App';
+import { SnackbarProvider } from 'notistack';
 import * as serviceWorker from './serviceWorker';
+import App from './App';
+import './index.css';
 import history from "./history";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Router history={history}>
+  <Router history={history}>
+    <SnackbarProvider maxSnack={2} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
       <App />
-    </Router>
-  </React.StrictMode>,
+    </SnackbarProvider>
+  </Router>,
   document.getElementById('root')
 );
 
